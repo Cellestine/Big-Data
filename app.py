@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 import os
-from database import MongoDB
+from DB.database import MongoDB
 from models.transaction import Transaction
 from services.anomaly_detector import AnomalyDetector
 
@@ -11,7 +11,6 @@ load_dotenv()
 # Ensuite récupérer les variables
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
-SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Maintenant on peut initialiser Flask et Mongo
 app = Flask(__name__)
