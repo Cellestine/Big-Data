@@ -21,11 +21,6 @@ db = MongoDB(uri=MONGO_URI, db_name=DATABASE_NAME)
 anomaly_detector = AnomalyDetector()
 
 
-@app.route("/")
-def home():
-    return "<h1>BlockSecure API</h1><p>Visitez <a href='/swagger'>/swagger</a> ou <a href='/'>/transactions</a> pour interagir.</p>"
-
-
 
 @ns.route("/<string:transaction_id>")
 class TransactionItem(Resource):
@@ -55,14 +50,26 @@ class AnomalyList(Resource):
         return anomalies
 
 
-@app.route("/transactions/<transaction_id>", methods=["GET"])
-def get_transaction(transaction_id):
-    tx = db.get_transaction_by_id(transaction_id)
-    if not tx:
-        return jsonify({"error": "Transaction non trouvée"}), 404
-    tx["_id"] = str(tx["_id"])
-    tx["is_anomalous"] = anomaly_detector.is_anomalous(tx)
-    return jsonify(tx)
+@ns.route("/anomalies/<string:transaction_id>")
+class AnomalyDetails(Resource):
+    def get(self, transaction_id):
+        tx = db.get_transaction_by_id(transaction_id)
+        if not tx:
+            return {"error": "Transaction non trouvée"}, 404
+
+        tx["_id"] = str(tx["_id"])
+        result = anomaly_detector.detect(tx)
+
+        if not result["is_anomalous"]:
+            return {
+                "message": "Cette transaction n’est pas considérée comme anormale.",
+                "transaction_id": tx["_id"]
+            }
+
+        # Retourner un résumé clair de la transaction
+        return Transaction.to_summary_dict(tx, result["anomaly_reason"])
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
