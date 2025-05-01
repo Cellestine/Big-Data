@@ -26,6 +26,18 @@ def home():
     return "<h1>BlockSecure API</h1><p>Visitez <a href='/swagger'>/swagger</a> ou <a href='/'>/transactions</a> pour interagir.</p>"
 
 
+
+@ns.route("/<string:transaction_id>")
+class TransactionItem(Resource):
+    def get(self, transaction_id):
+        tx = db.get_transaction_by_id(transaction_id)
+        if not tx:
+            return {"error": "Transaction non trouvée"}, 404
+        tx["_id"] = str(tx["_id"])
+        tx["is_anomalous"] = anomaly_detector.is_anomalous(tx)
+        return tx
+
+
     transactions = db.get_all_transactions()
     formatted = []
     for tx in transactions:
