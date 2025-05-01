@@ -38,13 +38,22 @@ class TransactionItem(Resource):
         return tx
 
 
-    transactions = db.get_all_transactions()
-    formatted = []
-    for tx in transactions:
-        tx["_id"] = str(tx["_id"])
-        tx["is_anomalous"] = anomaly_detector.is_anomalous(tx)
-        formatted.append(tx)
-    return jsonify(formatted)
+@ns.route("/anomalies")
+class AnomalyList(Resource):
+    def get(self):
+        transactions = db.get_all_transactions()
+        anomalies = []
+
+        for tx in transactions:
+            tx["_id"] = str(tx["_id"])
+            result = anomaly_detector.detect(tx)
+
+            if result["is_anomalous"]:
+                tx.update(result)
+                anomalies.append(tx)
+
+        return anomalies
+
 
 @app.route("/transactions/<transaction_id>", methods=["GET"])
 def get_transaction(transaction_id):
