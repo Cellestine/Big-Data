@@ -1,37 +1,31 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, render_template
 from dotenv import load_dotenv
+from flask_restx import Api, Resource
 import os
 from DB.database import MongoDB
 from models.transaction import Transaction
 from services.anomaly_detector import AnomalyDetector
 
-# Charger d'abord les variables d'environnement
-load_dotenv()
+# Initialisation Flask + RESTX
+app = Flask(__name__)
+api = Api(app, title="BlockSecure API", version="1.0", description="Détection d'anomalies sur les transactions Ethereum")
+ns = api.namespace("transactions", description="Opérations sur les transactions")
 
-# Ensuite récupérer les variables
+# Chargement variables d'env
+load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 
-# Maintenant on peut initialiser Flask et Mongo
-app = Flask(__name__)
-db = MongoDB(uri=MONGO_URI, db_name=DATABASE_NAME)  # <-- ici il faut passer uri et db_name !!
+# Initialisation MongoDB + Anomalie
+db = MongoDB(uri=MONGO_URI, db_name=DATABASE_NAME)
 anomaly_detector = AnomalyDetector()
 
-# Maintenant tes routes Flask
-@app.route("/transactions", methods=["POST"])
-def add_transaction():
-    data = request.json
-    tx = Transaction(
-        from_address=data.get("from_address"),
-        to_address=data.get("to_address"),
-        amount=data.get("amount"),
-        timestamp=data.get("timestamp")
-    )
-    transaction_id = db.insert_transaction(tx.to_dict())
-    return jsonify({"message": "Transaction ajoutée", "id": str(transaction_id)}), 201
 
-@app.route("/transactions", methods=["GET"])
-def list_transactions():
+@app.route("/")
+def home():
+    return "<h1>BlockSecure API</h1><p>Visitez <a href='/swagger'>/swagger</a> ou <a href='/'>/transactions</a> pour interagir.</p>"
+
+
     transactions = db.get_all_transactions()
     formatted = []
     for tx in transactions:
