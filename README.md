@@ -23,7 +23,6 @@ Le projet repose sur une architecture **Flask + MongoDB + Streamlit**, avec anal
 1. **Clone du projet**
 ```bash
 git clone https://github.com/Cellestine/Big-Data.git
-cd BlockSecure
 ```
 
 2. **Création de l’environnement**
@@ -43,6 +42,12 @@ MONGO_URI=mongodb://localhost:27017/
 DATABASE_NAME=blocksecure
 ```
 
+5. **importation de la base de donnée dans MongoDB**
+```bash
+cd DB
+python mongo_import.py
+```
+
 ---
 ## Lancer l'API Flask
 ---
@@ -54,7 +59,7 @@ python app.py
 ---
 ## Dashboard interactif (Streamlit)
 ---
-
+On ouvre un nouveau terminal et on se place dans l'env.
 Lance le tableau de bord visuel :
 ```bash
 streamlit run streamlit_dashboard.py
