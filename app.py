@@ -71,7 +71,13 @@ class AnomalyDetails(Resource):
         # Retourner un résumé clair de la transaction
         return Transaction.to_summary_dict(tx, result["anomaly_reason"])
 
-
+@ns.route("/all")
+class AllTransactions(Resource):
+    def get(self):
+        transactions = db.get_all_transactions()
+        for tx in transactions:
+            tx["_id"] = str(tx["_id"])  # Convertit l'ObjectId en string pour JSON
+        return transactions
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -7,7 +7,7 @@ from streamlit_pages.anomaly_lookup import lookup_transaction
 
 # Configuration de la page Streamlit (titre, largeur)
 st.set_page_config(page_title="BlockSecure", layout="wide")
-st.title("BlockSecure - Analyse des Anomalies")
+st.title("🛡️ BlockSecure - Analyse des Anomalies")
 
 # Tentative de récupération des données d'anomalies depuis l'API Flask locale
 try:
