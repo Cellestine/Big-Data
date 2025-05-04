@@ -5,6 +5,8 @@ import os
 from DB.database import MongoDB
 from models.transaction import Transaction
 from services.anomaly_detector import AnomalyDetector
+from services.ml_detector import MLAnomalyDetector
+from services.supervised_models import MultiModelFraudDetector
 
 # Initialisation Flask + RESTX
 app = Flask(__name__)
@@ -76,7 +78,6 @@ class AllTransactions(Resource):
         for tx in transactions:
             tx["_id"] = str(tx["_id"])  # Convertit l'ObjectId en string pour JSON
         return transactions
-
 
 if __name__ == "__main__":
     app.run(debug=True)
