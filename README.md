@@ -46,7 +46,7 @@ DATABASE_NAME=blocksecure
 ```bash
 cd DB
 python mongo_import.py
-```
+```  
 
 ---
 ## Lancer l'API Flask
@@ -60,9 +60,10 @@ python app.py
 ## Dashboard interactif (Streamlit)
 ---
 On ouvre un nouveau terminal et on se place dans l'env.
+(Il faut run cette commande depuis le repository Big-Data)
 Lance le tableau de bord visuel :
 ```bash
-streamlit run streamlit_dashboard.py
+venv\Scripts\python.exe -m streamlit run templates/streamlit_dashboard.py
 ```
 Fonctionnalités :
 
