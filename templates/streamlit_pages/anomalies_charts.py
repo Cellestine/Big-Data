@@ -31,10 +31,28 @@ def show_table(df):
 # ➤ 2. Histogramme des raisons d'anomalies
 def show_chart(df):
     st.subheader("📊 Raisons des Anomalies")
+
+    ALL_REASONS = [
+        "Low number of sent transactions (<=2)",
+        "High number of created contracts (>5)",
+        "High activity in short time",
+        "Very high send/receive ratio",
+        "Many different tokens sent (>10)",
+        "Unusually high avg ETH sent (top 1%)",
+        "ERC20 avg sent value very high (outlier)",
+        "Very wide token distribution (>100 addresses)",
+        "Long dormancy then sudden activity",
+        "Negative ether balance",
+        "Unusually high ether balance (> 1 ETH)"
+    ]
+
     exploded = df.explode("anomaly_reason")
-    count = exploded["anomaly_reason"].value_counts().reset_index()
+    count = exploded["anomaly_reason"].value_counts().reindex(ALL_REASONS, fill_value=0)
+    count = count.reset_index()
     count.columns = ["Raison", "Nombre"]
+
     st.bar_chart(count.set_index("Raison"))
+
 
 # ➤ 3. Heatmap des corrélations
 def show_correlation_heatmap(df):

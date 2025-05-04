@@ -11,10 +11,6 @@ st.title("🛡️ BlockSecure - Analyse des Anomalies")
 
 # Tentative de récupération des données d'anomalies depuis l'API Flask locale
 try:
-    url = "http://127.0.0.1:5000/transactions/anomalies"
-    df = pd.DataFrame(requests.get(url).json())
-    df.columns = df.columns.str.strip()  # Supprime les espaces avant/après les noms
-
     url_all = "http://127.0.0.1:5000/transactions/all"
     df_all = pd.DataFrame(requests.get(url_all).json())
     df_all.columns = df_all.columns.str.strip()
@@ -69,9 +65,9 @@ try:
 
     # Onglet 1 : Visualisations graphiques et indicateurs
     with tab1:
-        show_ether_kpis(df)  # Indicateurs clés sur les anomalies
+        show_ether_kpis(df_flagged)  # Indicateurs clés sur les anomalies
         st.subheader("Analyse Graphique des Anomalies")
-        show_chart(df)  # Graphique des raisons d’anomalies
+        show_chart(df_flagged)  # Graphique des raisons d’anomalies
 
         st.divider()  # Séparateur visuel
 
@@ -84,12 +80,12 @@ try:
         #     st.subheader("📊 Corrélations entre Variables")
         #     show_correlation_heatmap(df) # Corrélations entre variables
         
-        show_top_tokens_sent(df)         # Tokens les plus envoyés
+        show_top_tokens_sent(df_flagged)         # Tokens les plus envoyés
 
     # Onglet 2 : Tableau de données brutes
     with tab2:
         st.subheader("Tableau des Transactions Anormales")
-        show_table(df)  # Affichage des anomalies sous forme de tableau
+        show_table(df_flagged)  # Affichage des anomalies sous forme de tableau
 
     # Onglet 3 : Moteur de recherche d'une adresse / transaction spécifique
     with tab3:
