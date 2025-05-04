@@ -7,6 +7,7 @@ from streamlit_pages.anomaly_lookup import lookup_transaction
 st.set_page_config(page_title="BlockSecure", layout="wide")
 st.title("BlockSecure - Analyse des Anomalies")
 
+
 # Charger les données une fois
 try:
     url = "http://127.0.0.1:5000/transactions/anomalies"
