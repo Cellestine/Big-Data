@@ -5,6 +5,8 @@ import os
 from DB.database import MongoDB
 from models.transaction import Transaction
 from services.anomaly_detector import AnomalyDetector
+from services.ml_detector import MLAnomalyDetector
+from services.supervised_models import MultiModelFraudDetector
 
 # Initialisation Flask + RESTX
 app = Flask(__name__)
@@ -69,6 +71,31 @@ class AnomalyDetails(Resource):
         # Retourner un résumé clair de la transaction
         return Transaction.to_summary_dict(tx, result["anomaly_reason"])
 
+# # entraînement dès le démarrage non supervisé
+# ml_detector = MLAnomalyDetector()
+# ml_detector.fit(db.get_all_transactions())  # entraînement au lancement
+
+ml_detector = MultiModelFraudDetector()
+ml_detector.load_models()
+
+@ns.route("/predict-ml/<string:transaction_id>")
+class PredictML(Resource):
+    def get(self, transaction_id):
+        model_name = request.args.get("model", "xgb")
+
+        # Récupérer la transaction
+        transaction = db.get_transaction_by_id(transaction_id)
+        if not transaction:
+            return {"error": "Transaction introuvable"}, 404
+
+        transaction["_id"] = str(transaction["_id"])
+        prediction_result = ml_detector.predict(model_name, transaction)
+
+        if "error" in prediction_result:
+            return prediction_result, 400
+
+        summary = Transaction.to_ml_prediction_dict(transaction, prediction_result)
+        return summary
 
 
 if __name__ == "__main__":
