@@ -21,21 +21,24 @@ try:
 
 
     st.markdown(" 📌 Indicateurs Clés")
-    # st.write("Colonnes disponibles :", df_all.columns.tolist())
+    st.write("Colonnes disponibles :", df_all.columns.tolist())
 
 
     # ------- Affichage des KPIS -----------------
     col1, col2, col3, col4 = st.columns(4)
 
+    df_flagged = df_all[df_all["FLAG"] == 1]  # Anomalies réelles
     with col1:
         st.metric(label="📊 Transactions Totales", value=len(df_all))
 
     with col2:
-        pct_anomalies = (len(df) / len(df_all) * 100) if len(df_all) > 0 else 0
+        nb_anomalies = len(df_flagged)
+        pct_anomalies = (nb_anomalies / len(df_all) * 100) if len(df_all) > 0 else 0
+
         st.metric(
             label="🚨 Anomalies",
             value=f"{pct_anomalies:.2f}%",
-            delta=f"{len(df)} sur {len(df_all)}",
+            delta=f"{nb_anomalies} sur {len(df_all)}",
             delta_color="inverse"
         )
     
@@ -48,14 +51,15 @@ try:
             st.metric("💰 Volume Total (ETH)", f"{total_volume:,.2f} ETH")
 
         # KPI 4 : Volume suspect échangé
-        anomaly_sent = df["total Ether sent"].abs().sum()
-        anomaly_received = df["total ether received"].sum()
+        anomaly_sent = df_flagged["total Ether sent"].abs().sum()
+        anomaly_received = df_flagged["total ether received"].sum()
         anomaly_volume = anomaly_sent + anomaly_received
         pct_anomaly_vol = (anomaly_volume / total_volume * 100) if total_volume > 0 else 0
         with col4:
             st.metric("⚠️ Volume Suspect", f"{anomaly_volume:,.2f} ETH", f"{pct_anomaly_vol:.2f}%")   
 
 
+    #------------------------------------------------------------#
     # Création de trois onglets pour structurer l'application
     tab1, tab2, tab3 = st.tabs([
         "📊 Analyse",
@@ -71,9 +75,15 @@ try:
 
         st.divider()  # Séparateur visuel
 
-        # Indicateurs complémentaires
-        show_balance_vs_activity(df)     # Scatter plot balance vs activité
-        show_correlation_heatmap(df)     # Corrélations entre variables
+        # # Indicateurs complémentaires
+        # colgraph1, colgraph2 = st.columns(2)
+        # with colgraph1:
+        #     st.subheader("📈 Activité vs Solde")
+        #     show_balance_vs_activity(df) # Scatter plot balance vs activité
+        # with colgraph2:
+        #     st.subheader("📊 Corrélations entre Variables")
+        #     show_correlation_heatmap(df) # Corrélations entre variables
+        
         show_top_tokens_sent(df)         # Tokens les plus envoyés
 
     # Onglet 2 : Tableau de données brutes

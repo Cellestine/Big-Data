@@ -62,14 +62,28 @@ def show_balance_vs_activity(df):
     ax.set_ylabel("Solde total (ETH)")
     st.pyplot(fig)
 
-# ➤ 5. Top tokens envoyés
 def show_top_tokens_sent(df):
     st.subheader("🏷️ Top Tokens Envoyés (ERC20)")
-    if "ERC20 most sent token type" in df:
-        top_tokens = df["ERC20 most sent token type"].value_counts().head(10)
-        st.bar_chart(top_tokens)
+
+    column = "ERC20 most sent token type"
+    
+    if column in df:
+        # Nettoyage : on enlève les NaN, les "0", les chaînes vides et les espaces
+        cleaned_series = df[column].dropna()
+        cleaned_series = cleaned_series[cleaned_series.astype(str).str.strip().ne("0")]
+        cleaned_series = cleaned_series[cleaned_series.astype(str).str.strip().ne("")]
+
+        if cleaned_series.empty:
+            st.info("Aucun token pertinent envoyé dans les données.")
+        else:
+            top_tokens_df = cleaned_series.value_counts().head(10).reset_index()
+            top_tokens_df.columns = ["Token", "Count"]
+            top_tokens_df = top_tokens_df.set_index("Token")  # pour que les labels restent en ordre
+            st.bar_chart(top_tokens_df)
+
     else:
-        st.info("Aucune donnée de token envoyée disponible.")
+        st.info("Colonne non disponible dans les données.")
+
 
 
 # ➤ 6. KPI Ether
